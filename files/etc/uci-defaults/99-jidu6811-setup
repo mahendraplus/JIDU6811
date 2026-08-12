@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# Set system hostname and timezone
+uci set system.@system[0].hostname="Maxnet"
+uci set system.@system[0].zonename="Asia/Kolkata"
+uci set system.@system[0].timezone="IST-5:30"
+uci commit system
+
+# Enable Dropbear SSH on all interfaces
+uci set dropbear.@dropbear[0].Interface=""
+uci commit dropbear
+
+# Setup QCN9074 ath11k calibration file
+mkdir -p /lib/firmware/ath11k/QCN9074/hw1.0
+rm -f /lib/firmware/ath11k/QCN9074/hw1.0/board-2.bin
+if [ -f /lib/firmware/ath11k/QCN9074/hw1.0/board.bin ]; then
+	ln -sf /lib/firmware/ath11k/QCN9074/hw1.0/board.bin /lib/firmware/ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin
+fi
+
+# Enable wireless radios if detected
+if uci get wireless.radio0 >/dev/null 2>&1; then
+	uci set wireless.radio0.disabled="0"
+	uci set wireless.radio0.band="5g"
+	uci set wireless.radio0.channel="36"
+	uci set wireless.radio0.htmode="HE80"
+	uci set wireless.radio0.country="IN"
+	if ! uci get wireless.default_radio0 >/dev/null 2>&1; then
+		uci add wireless wifi-iface
+		uci set wireless.@wifi-iface[-1].device="radio0"
+		uci set wireless.@wifi-iface[-1].network="lan"
+		uci set wireless.@wifi-iface[-1].mode="ap"
+		uci set wireless.@wifi-iface[-1].ssid="Maxnet-5G"
+		uci set wireless.@wifi-iface[-1].encryption="psk2"
+		uci set wireless.@wifi-iface[-1].key="maxnet1234"
+	fi
+fi
+
+if uci get wireless.radio1 >/dev/null 2>&1; then
+	uci set wireless.radio1.disabled="0"
+	if ! uci get wireless.default_radio1 >/dev/null 2>&1; then
+		uci add wireless wifi-iface
+		uci set wireless.@wifi-iface[-1].device="radio1"
+		uci set wireless.@wifi-iface[-1].network="lan"
+		uci set wireless.@wifi-iface[-1].mode="ap"
+		uci set wireless.@wifi-iface[-1].ssid="Maxnet-2G"
+		uci set wireless.@wifi-iface[-1].encryption="psk2"
+		uci set wireless.@wifi-iface[-1].key="maxnet1234"
+	fi
+fi
+
+# Add USB Tethering interface (wan_usb) for mobile internet
+if ! uci get network.wan_usb >/dev/null 2>&1; then
+	uci set network.wan_usb=interface
+	uci set network.wan_usb.proto="dhcp"
+	uci set network.wan_usb.device="usb0"
+	uci commit network
+	if uci get firewall.@zone[1] >/dev/null 2>&1; then
+		uci add_list firewall.@zone[1].network="wan_usb"
+		uci commit firewall
+	fi
+fi
+
+# Allow WAN HTTP/SSH input for remote access when connected as client
+if uci get firewall.@zone[1] >/dev/null 2>&1; then
+	uci set firewall.@zone[1].input="ACCEPT"
+	uci set firewall.@zone[1].masq="1"
+	uci set firewall.@zone[1].mtu_fix="1"
+	uci commit firewall
+fi
+
+# Enable LED Internet Lifecycle Monitor Service
+/etc/init.d/led_internet_monitor enable
+/etc/init.d/led_internet_monitor start
+
+uci commit wireless
+exit 0
