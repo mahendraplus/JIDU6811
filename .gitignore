@@ -1,0 +1,19 @@
+# OpenWrt build artifacts
+build_dir/
+dl/
+staging_dir/
+tmp/
+logs/
+bin/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.pyc
