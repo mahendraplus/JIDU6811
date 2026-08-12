@@ -1,0 +1,162 @@
+name: Build
+
+on:
+  push:
+    branches: [Max, main, master]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+  workflow_dispatch:
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+  CCACHE_DIR: /tmp/ccache
+
+permissions:
+  contents: write
+
+jobs:
+  build_and_release:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: custom
+
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache /usr/local/share/boost /usr/lib/jvm /usr/share/swift
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq build-essential gawk git libncurses-dev \
+            libssl-dev python3 zlib1g-dev file wget curl bc rsync unzip gettext \
+            ccache libelf-dev bison flex mtd-utils
+
+      - name: Restore Build Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            /tmp/ccache
+            ~/openwrt_dl
+            openwrt/staging_dir
+          key: openwrt-${{ runner.os }}-${{ hashFiles('custom/.github/scripts/write_config.py') }}
+          restore-keys: openwrt-${{ runner.os }}-
+
+      - name: Calculate Semantic Version
+        run: |
+          NUM=${{ github.run_number }}
+          MAJOR=$(( 1 + (NUM - 1) / 100 ))
+          MOD100=$(( (NUM - 1) % 100 ))
+          MINOR=$(( MOD100 / 10 ))
+          PATCH=$(( MOD100 % 10 ))
+          VERSION="v${MAJOR}.${MINOR}.${PATCH}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "Version: ${VERSION} (build #${NUM})"
+
+      - name: Clone OpenWrt and Apply JIDU6811 Files
+        run: |
+          rm -rf openwrt
+          git clone --depth=1 https://github.com/openwrt/openwrt.git openwrt
+          mkdir -p ~/openwrt_dl openwrt/files openwrt/dl
+          ln -sf ~/openwrt_dl openwrt/dl || true
+
+          mkdir -p openwrt/target/linux/qualcommbe/dts/qcom
+          cp -f custom/target/linux/qualcommbe/dts/ipq9574-jidu6811.dts  openwrt/target/linux/qualcommbe/dts/
+          cp -f custom/target/linux/qualcommbe/dts/ipq9574-jidu6811.dtsi openwrt/target/linux/qualcommbe/dts/ || true
+          cp -f custom/target/linux/qualcommbe/dts/ipq9574-jidu6811.dts  openwrt/target/linux/qualcommbe/dts/qcom/
+          cp -f custom/target/linux/qualcommbe/dts/ipq9574-jidu6811.dtsi openwrt/target/linux/qualcommbe/dts/ || trueqcom/
+
+          if [ -d custom/target/linux/qualcommbe ]; then
+            rsync -a custom/target/linux/qualcommbe/ openwrt/target/linux/qualcommbe/
+          fi
+
+          rsync -a custom/files/ openwrt/files/
+
+          if [ -f openwrt/files/etc/banner ]; then
+            sed -i "s/VERSION_PLACEHOLDER/${VERSION}/g" openwrt/files/etc/banner
+            sed -i "s/BUILD_NUM_PLACEHOLDER/${{ github.run_number }}/g" openwrt/files/etc/banner
+            sed -i "s/BUILD_TIMESTAMP_PLACEHOLDER/$(date -u +'%Y-%m-%d %H:%M UTC')/g" openwrt/files/etc/banner
+          fi
+
+      - name: Register JIDU6811 Device Profile
+        run: python3 custom/.github/scripts/add_device.py openwrt/target/linux/qualcommbe/image/ipq95xx.mk
+
+      - name: Configure Feeds and Kconfig
+        run: |
+          cd openwrt
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+          python3 ../custom/.github/scripts/write_config.py .config
+          make defconfig
+
+      - name: Download Sources
+        working-directory: openwrt
+        run: |
+          make download -j$(nproc) V=s || (sleep 5 && make download -j1 V=s) || (sleep 10 && make download -j1 V=s)
+
+      - name: Compile Firmware
+        working-directory: openwrt
+        run: |
+          set +e
+          make -j$(nproc) V=s 2>&1 | tee /tmp/build.log; STATUS=${PIPESTATUS[0]}
+          if [ $STATUS -ne 0 ]; then
+            echo "=== LAST 100 LINES ==="
+            tail -100 /tmp/build.log
+            echo "=== ERRORS ONLY ==="
+            grep -E "^make\[|error:|Error [0-9]|FAILED|\.patch failed|Hunk|undefined ref|cannot find|No rule|recipe for" /tmp/build.log | grep -v "ignored\|is always" | tail -60
+            exit $STATUS
+          fi
+          set -e
+
+      - name: Gather Release Files
+        run: |
+          mkdir -p custom/release_files
+          BINDIR=openwrt/bin/targets/qualcommbe/ipq95xx
+          echo "=== Build output ===" && ls -la "$BINDIR"/ 2>/dev/null || echo "Build dir not found"
+          cp "$BINDIR"/*jio_jidu6811*-initramfs-uImage.itb custom/release_files/initramfs.itb 2>/dev/null || true
+          cp "$BINDIR"/*jio_jidu6811*-sysupgrade.bin custom/release_files/sysupgrade.bin 2>/dev/null || true
+          cp "$BINDIR"/*jio_jidu6811*-factory.ubi custom/release_files/factory.ubi 2>/dev/null || true
+          cp "$BINDIR"/sha256sums custom/release_files/ 2>/dev/null || true
+          cp "$BINDIR"/profiles.json custom/release_files/ 2>/dev/null || true
+          echo "=== Release files ===" && ls -la custom/release_files/
+
+      - name: Build factory.ubi if missing
+        run: |
+          [ -f custom/release_files/factory.ubi ] && exit 0
+          WORKSPACE="$(pwd)"
+          BINDIR=openwrt/bin/targets/qualcommbe/ipq95xx
+          SYS="$(ls $WORKSPACE/$BINDIR/*jio_jidu6811*-sysupgrade.bin 2>/dev/null | head -n 1 || true)"
+          ITB="$(ls $WORKSPACE/$BINDIR/*jio_jidu6811*-initramfs-uImage.itb 2>/dev/null | head -n 1 || true)"
+          SPLIT="$WORKSPACE/custom/.github/scripts/split_sysupgrade.py"
+          [ -z "$SYS" ] && [ -z "$ITB" ] && echo "ERROR: no build output" && exit 1
+          mkdir -p /tmp/ubi_build && cd /tmp/ubi_build
+          if [ -f "$SYS" ]; then
+            python3 "$SPLIT" "$SYS"
+          elif [ -f "$ITB" ]; then
+            cp "$ITB" kernel.bin
+            dd if=/dev/zero of=rootfs.bin bs=1M count=1 2>/dev/null
+          fi
+          printf '[kernel]\nmode=ubi\nimage=kernel.bin\nvol_id=0\nvol_type=static\nvol_name=kernel\n\n[rootfs]\nmode=ubi\nimage=rootfs.bin\nvol_id=1\nvol_type=static\nvol_name=rootfs\n' > ubinize.cfg
+          ubinize -o factory.ubi -m 2048 -p 128KiB -O 64 ubinize.cfg
+          [ -s factory.ubi ] || { echo "ERROR: ubinize failed"; exit 1; }
+          cp factory.ubi "$GITHUB_WORKSPACE/custom/release_files/factory.ubi"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jidu6811-firmware
+          path: custom/release_files/*
+          retention-days: 14
+
+      - name: Publish Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/Max' || github.ref == 'refs/heads/main'
+        with:
+          tag_name: ${{ env.VERSION }}-b${{ github.run_number }}
+          name: ${{ env.VERSION }}
+          draft: false
+          prerelease: false
+          files: custom/release_files/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
