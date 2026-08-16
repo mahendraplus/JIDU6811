@@ -6,7 +6,7 @@
 
 / {
 	model = "JioRouter AX6000 JIDU6J11-6811";
-	compatible = "jiorouter,ax6000-jidu6j11-6811", "jiorouter,ax6000-jidu6j11", "qcom,ipq9574";
+	compatible = "jiorouter,ax6000-jidu6j11-6811", "jiorouter,ax6000-jidu6j11", "jio,jidu6811", "qcom,ipq9574";
 };
 
 &wifi0 {

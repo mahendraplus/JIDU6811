@@ -6,14 +6,13 @@ uci set system.@system[0].zonename="Asia/Kolkata"
 uci set system.@system[0].timezone="IST-5:30"
 uci commit system
 
-# Enable Dropbear SSH on all interfaces
+# Enable Dropbear SSH on LAN
 uci set dropbear.@dropbear[0].Interface=""
 uci commit dropbear
 
-# Setup QCN9074 ath11k calibration file
+# Setup QCN9074 ath11k calibration file fallback if board.bin exists
 mkdir -p /lib/firmware/ath11k/QCN9074/hw1.0
-rm -f /lib/firmware/ath11k/QCN9074/hw1.0/board-2.bin
-if [ -f /lib/firmware/ath11k/QCN9074/hw1.0/board.bin ]; then
+if [ -f /lib/firmware/ath11k/QCN9074/hw1.0/board.bin ] && [ ! -e /lib/firmware/ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin ]; then
 	ln -sf /lib/firmware/ath11k/QCN9074/hw1.0/board.bin /lib/firmware/ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin
 fi
 
@@ -58,14 +57,6 @@ if ! uci get network.wan_usb >/dev/null 2>&1; then
 		uci add_list firewall.@zone[1].network="wan_usb"
 		uci commit firewall
 	fi
-fi
-
-# Allow WAN HTTP/SSH input for remote access when connected as client
-if uci get firewall.@zone[1] >/dev/null 2>&1; then
-	uci set firewall.@zone[1].input="ACCEPT"
-	uci set firewall.@zone[1].masq="1"
-	uci set firewall.@zone[1].mtu_fix="1"
-	uci commit firewall
 fi
 
 # Enable LED Internet Lifecycle Monitor Service

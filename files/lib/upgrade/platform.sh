@@ -23,15 +23,13 @@ jidu6811_initial_setup()
 	fw_setenv bootargs 'console=ttyMSM0,115200n8 ubi.mtd=ubi root=/dev/ubiblock0_1 rootfstype=squashfs' || return 1
 }
 
-platform_pre_upgrade()
-{
+platform_pre_upgrade() {
 	return 0
 }
 
-platform_do_upgrade()
-{
+platform_do_upgrade() {
 	case "$(board_name)" in
-	jio,jidu6811|jiorouter,ax6000-jidu6j11)
+	jio,jidu6811*|jiorouter,ax6000-jidu6j11*)
 		jidu6811_initial_setup || return 1
 		CI_UBIPART="ubi"
 		nand_do_upgrade "$1"
@@ -42,12 +40,11 @@ platform_do_upgrade()
 	esac
 }
 
-platform_check_image()
-{
+platform_check_image() {
 	local board=$(board_name)
 
 	case "$board" in
-	jio,jidu6811|jiorouter,ax6000-jidu6j11)
+	jio,jidu6811*|jiorouter,ax6000-jidu6j11*)
 		nand_do_platform_check "$board" "$1"
 		return $?
 		;;

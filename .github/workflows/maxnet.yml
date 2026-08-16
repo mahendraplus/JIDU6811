@@ -37,8 +37,7 @@ jobs:
           git clone --depth 1 https://github.com/openwrt/openwrt.git openwrt
           cp -r custom/files openwrt/
           mkdir -p openwrt/target/linux/qualcommbe/dts/qcom/
-          cp -r custom/target/linux/qualcommbe/dts/* openwrt/target/linux/qualcommbe/dts/
-          cp -r custom/target/linux/qualcommbe/patches-6.18/* openwrt/target/linux/qualcommbe/patches-6.18/ 2>/dev/null || true
+          cp -r custom/target/linux/qualcommbe/* openwrt/target/linux/qualcommbe/
           
           # Force strip debug symbols in target config-6.18
           sed -i 's/CONFIG_DEBUG_INFO=y/# CONFIG_DEBUG_INFO is not set\nCONFIG_DEBUG_INFO_NONE=y/g' openwrt/target/linux/qualcommbe/config-6.18 2>/dev/null || true
@@ -53,7 +52,7 @@ jobs:
             openwrt/.ccache
             openwrt/staging_dir/toolchain-*
             openwrt/staging_dir/host*
-          key: openwrt-fastcache-${{ runner.os }}-qualcommbe-${{ hashFiles('custom/.github/scripts/write_config.py') }}
+          key: openwrt-fastcache-${{ runner.os }}-qualcommbe-${{ hashFiles('custom/.github/scripts/write_config.py', 'custom/.github/scripts/add_device.py') }}
           restore-keys: |
             openwrt-fastcache-${{ runner.os }}-qualcommbe-
 
@@ -100,13 +99,6 @@ jobs:
 
           # Verify files exist
           ls -la custom/release_files/
-
-      - name: Build factory.ubi if missing
-        run: |
-          cd custom/release_files
-          if [ ! -f "factory.ubi" ] && [ -f "initramfs.itb" ]; then
-            python3 ../.github/scripts/split_sysupgrade.py initramfs.itb factory.ubi 16384000
-          fi
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4

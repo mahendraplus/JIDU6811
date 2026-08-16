@@ -24,7 +24,7 @@ jidu6811_initial_setup() {
 
 platform_do_upgrade() {
 	case "$(board_name)" in
-	jio,jidu6811|jiorouter,ax6000-jidu6j11)
+	jio,jidu6811*|jiorouter,ax6000-jidu6j11*)
 		jidu6811_initial_setup || return 1
 		CI_UBIPART="ubi"
 		nand_do_upgrade "$1"
@@ -39,7 +39,7 @@ platform_check_image() {
 	local board=$(board_name)
 
 	case "$board" in
-	jio,jidu6811|jiorouter,ax6000-jidu6j11)
+	jio,jidu6811*|jiorouter,ax6000-jidu6j11*)
 		nand_do_platform_check "$board" "$1"
 		return $?
 		;;

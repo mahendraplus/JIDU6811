@@ -13,7 +13,7 @@ config = [
     "CONFIG_DEVEL=y",
     "CONFIG_CCACHE=y",
 
-    # Explicitly strip kernel debug symbols & bloat to keep vmlinux <= 26.8MB
+    # Explicitly strip kernel debug symbols & bloat to keep vmlinux lean
     "CONFIG_KALLSYMS_ALL=n",
     "CONFIG_DEBUG_INFO=n",
     "CONFIG_DEBUG_INFO_NONE=y",
@@ -22,19 +22,35 @@ config = [
     "CONFIG_DEBUG_BUGVERBOSE=n",
     "CONFIG_LOCK_DEBUGGING_SUPPORT=n",
 
-    # Essential built-in SoC clock controllers (=y)
+    # Essential built-in SoC clock controllers and pinctrl
     "CONFIG_PACKAGE_kmod-qcom-gcc-ipq9574=y",
     "CONFIG_PACKAGE_kmod-qcom-nsscc-ipq9574=y",
-
-    # Core 2.4GHz / 5GHz Wi-Fi and 5-port Gigabit Ethernet drivers (=y)
+    "CONFIG_PACKAGE_kmod-pcs-qcom-ipq9574=y",
     "CONFIG_PACKAGE_kmod-qcom-ppe=y",
+
+    # Core 2.4GHz / 5GHz Wi-Fi drivers and firmware
     "CONFIG_PACKAGE_kmod-ath11k=y",
     "CONFIG_PACKAGE_kmod-ath11k-pci=y",
     "CONFIG_PACKAGE_kmod-ath11k-ahb=y",
-
-    # Firmware packages required by ath11k (=y)
     "CONFIG_PACKAGE_ath11k-firmware-ipq9574=y",
     "CONFIG_PACKAGE_ath11k-firmware-qcn9074=y",
+
+    # GPIO, LEDs, Buttons & Triggers
+    "CONFIG_PACKAGE_kmod-leds-gpio=y",
+    "CONFIG_PACKAGE_kmod-gpio-button-hotplug=y",
+    "CONFIG_PACKAGE_kmod-ledtrig-netdev=y",
+
+    # USB 3.0 & Tethering support
+    "CONFIG_PACKAGE_kmod-usb3=y",
+    "CONFIG_PACKAGE_kmod-usb-dwc3=y",
+    "CONFIG_PACKAGE_kmod-usb-dwc3-qcom=y",
+    "CONFIG_PACKAGE_kmod-usb-net=y",
+    "CONFIG_PACKAGE_kmod-usb-net-rndis=y",
+    "CONFIG_PACKAGE_kmod-usb-net-cdc-ether=y",
+
+    # Wireless authentication & Web UI
+    "CONFIG_PACKAGE_wpad-basic-mbedtls=y",
+    "CONFIG_PACKAGE_luci=y",
 
     # Wireless & CLI Management tools
     "CONFIG_PACKAGE_iw=y",
@@ -44,16 +60,6 @@ config = [
     "CONFIG_PACKAGE_dropbear=y",
     "CONFIG_PACKAGE_mtd=y",
     "CONFIG_PACKAGE_uboot-envtools=y",
-
-    # Heavy non-essential packages set to =m (built for flash, not in initramfs)
-    "CONFIG_PACKAGE_wpad-basic-mbedtls=m",
-    "CONFIG_PACKAGE_luci=m",
-    "CONFIG_PACKAGE_kmod-usb3=m",
-    "CONFIG_PACKAGE_kmod-usb-dwc3=m",
-    "CONFIG_PACKAGE_kmod-usb-dwc3-qcom=m",
-    "CONFIG_PACKAGE_kmod-leds-gpio=m",
-    "CONFIG_PACKAGE_kmod-gpio-button-hotplug=m",
-    "CONFIG_PACKAGE_kmod-ledtrig-netdev=m",
 ]
 
 out = sys.argv[1] if len(sys.argv) > 1 else ".config"
