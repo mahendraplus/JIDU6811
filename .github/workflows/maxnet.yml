@@ -1,6 +1,10 @@
 name: MaxNet Build
 
 on:
+  push:
+    branches:
+      - Max
+      - main
   workflow_dispatch:
 
 permissions:
