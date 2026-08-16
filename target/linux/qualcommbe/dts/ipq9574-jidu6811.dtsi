@@ -20,6 +20,7 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
+		bootargs = "console=ttyMSM0,115200n8 earlycon";
 	};
 
 	memory@40000000 {

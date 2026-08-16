@@ -69,6 +69,8 @@ jobs:
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          mkdir -p package/kernel/mac80211/patches/ath11k/
+          cp -r ../custom/patches/mac80211/* package/kernel/mac80211/patches/ath11k/ 2>/dev/null || true
           python3 ../custom/.github/scripts/write_config.py .config
           make defconfig
           python3 ../custom/.github/scripts/write_config.py .config
