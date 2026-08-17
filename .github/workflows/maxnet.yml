@@ -135,18 +135,15 @@ jobs:
           path: custom/release_files/
 
       - name: Publish Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.versioning.outputs.tag_name }}
-          name: ${{ steps.versioning.outputs.semver }}
-          body: |
-            ### 🚀 MaxNet OpenWrt Firmware for Jio AirFiber IDU (JIDU6811)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.versioning.outputs.tag_name }}
+          RELEASE_TITLE: ${{ steps.versioning.outputs.semver }}
+        run: |
+          gh release create "$TAG_NAME" custom/release_files/* \
+            --title "$RELEASE_TITLE" \
+            --notes "### 🚀 MaxNet OpenWrt Firmware for Jio AirFiber IDU (JIDU6811)
             
             - **Base**: OpenWrt Linux 6.18 (QualcommBE IPQ9574)
             - **Target**: JioRouter AX6000 JIDU6811 / JIDU6J11
-            - **Build Tag**: `${{ steps.versioning.outputs.tag_name }}`
-          files: custom/release_files/*
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            - **Build Tag**: \`$TAG_NAME\`"
