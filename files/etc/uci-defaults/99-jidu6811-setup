@@ -45,9 +45,10 @@ fi
 if uci get wireless.radio1 >/dev/null 2>&1; then
 	uci set wireless.radio1.disabled="0"
 	uci set wireless.radio1.band="2g"
-	uci set wireless.radio1.channel="6"
+	uci set wireless.radio1.channel="1"
 	uci set wireless.radio1.htmode="HT20"
 	uci set wireless.radio1.noscan="1"
+	uci set wireless.radio1.legacy_rates="1"
 	uci set wireless.radio1.country="IN"
 	if ! uci get wireless.default_radio1 >/dev/null 2>&1; then
 		uci add wireless wifi-iface

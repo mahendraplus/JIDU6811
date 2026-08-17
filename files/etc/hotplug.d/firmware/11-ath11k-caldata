@@ -3,21 +3,16 @@
 [ -e /lib/firmware/$FIRMWARE ] && exit 0
 
 . /lib/functions.sh
+. /lib/functions/caldata.sh
 
 case "$FIRMWARE" in
 "ath11k/IPQ9574/hw1.0/cal-ahb-c000000.wifi.bin")
-	mkdir -p /lib/firmware/ath11k/IPQ9574/hw1.0
-	art=$(find_mtd_chardev "0:ART")
-	if [ -n "$art" ]; then
-		dd if=$art of=/lib/firmware/ath11k/IPQ9574/hw1.0/cal-ahb-c000000.wifi.bin bs=4096 skip=1 count=32 2>/dev/null
-	fi
+	caldata_extract "0:ART" 0x1000 0x20000
+	ath11k_remove_regdomain
 	;;
 "ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin")
-	mkdir -p /lib/firmware/ath11k/QCN9074/hw1.0
-	art=$(find_mtd_chardev "0:ART")
-	if [ -n "$art" ]; then
-		dd if=$art of=/lib/firmware/ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin bs=4096 skip=76 count=32 2>/dev/null
-	fi
+	caldata_extract "0:ART" 0x4c000 0x20000
+	ath11k_remove_regdomain
 	;;
 *)
 	exit 1
