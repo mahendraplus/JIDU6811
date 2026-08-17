@@ -73,8 +73,20 @@ jobs:
           cd openwrt
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          
+          # Allow kmod-ath11k-ahb on qualcommbe target
+          sed -i 's/@TARGET_qualcommax/@(TARGET_qualcommax||TARGET_qualcommbe)/g' package/kernel/mac80211/ath.mk
+          
+          # Copy mac80211 patches for IPQ9574 AHB support
           mkdir -p package/kernel/mac80211/patches/ath11k/
           cp -r ../custom/patches/mac80211/* package/kernel/mac80211/patches/ath11k/ 2>/dev/null || true
+          
+          # Populate release version and build timestamp in banner
+          NOW=$(date -u "+%Y-%m-%d %H:%M UTC")
+          sed -i "s/VERSION_PLACEHOLDER/${{ steps.ver.outputs.semver }}/g" files/etc/banner 2>/dev/null || true
+          sed -i "s/#BUILD_NUM_PLACEHOLDER/#${{ github.run_number }}/g" files/etc/banner 2>/dev/null || true
+          sed -i "s/BUILD_TIMESTAMP_PLACEHOLDER/${NOW}/g" files/etc/banner 2>/dev/null || true
+          
           python3 ../custom/.github/scripts/write_config.py .config
           make defconfig
           python3 ../custom/.github/scripts/write_config.py .config

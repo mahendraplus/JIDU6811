@@ -1,15 +1,9 @@
-# ⚠️ FIRMWARE NOT READY — DO NOT TEST
-
-**Work in progress: building a high-performance firmware.** This build is currently under development and is **not ready for testing**. Please do not flash this on your device yet. A stable release announcement will be posted here once available.
-
----
-
 <div align="center">
 
-# OpenWrt for Jio AirFiber IDU
-### JIDU6811 / JIDU6J11
+# MaxNet OpenWrt for Jio AirFiber IDU
+### JIDU6811 / JIDU6J11 (Qualcomm IPQ9574 / IPQ9554)
 
-Official OpenWrt **Linux 6.18 (AArch64 64-bit)** firmware for the **Jio AirFiber IDU (Qualcomm IPQ9574)** router.
+Official high-performance OpenWrt **Linux 6.18 (AArch64 64-bit)** firmware for the **Jio AirFiber IDU** router.
 
 [![Build Status](https://github.com/mahendraplus/maxidu/actions/workflows/maxnet.yml/badge.svg)](https://github.com/mahendraplus/maxidu/actions/workflows/maxnet.yml)
 [![Release](https://img.shields.io/github/v/release/mahendraplus/maxidu?color=blue&label=release)](https://github.com/mahendraplus/maxidu/releases/latest)
@@ -163,31 +157,33 @@ sudo chmod 777 /srv/tftp/initramfs.itb
 sudo systemctl restart tftpd-hpa
 ```
 
-### 1.3 Boot from TFTP
+### 1.3 Boot from TFTP (RAM Boot)
 
-In U-Boot console (`IPQ9574#`), type these **one by one**:
+In the U-Boot console (`IPQ9574#`), copy and paste these commands:
 
-**1. Initialize Ethernet (REQUIRED)**
-```bash
-setenv ethact eth0
-```
-
-**2. Set IP addresses**
 ```bash
 setenv ipaddr 192.168.1.10
-```
-
-```bash
 setenv serverip 192.168.1.2
+
+dcache off
+icache off
+
+setenv fdt_high 0xffffffff
+setenv initrd_high 0xffffffff
+
+setenv bootargs "console=ttyMSM0,115200n8"
+
+tftpboot 0x46000000 initramfs.itb
+bootm 0x46000000
 ```
 
-**3. Download and boot**
-```bash
-tftpboot 0x44000000 initramfs.itb
-```
+#### ⚡ Quick 1-Command Boot Macro (Optional)
+
+Save this macro in U-Boot so you can boot anytime with just `run boot_maxnet`:
 
 ```bash
-bootm
+setenv boot_maxnet 'setenv ipaddr 192.168.1.10; setenv serverip 192.168.1.2; dcache off; icache off; setenv fdt_high 0xffffffff; setenv initrd_high 0xffffffff; setenv bootargs "console=ttyMSM0,115200n8"; tftpboot 0x46000000 initramfs.itb; bootm 0x46000000'
+run boot_maxnet
 ```
 
 ### 1.4 Verify It Works
