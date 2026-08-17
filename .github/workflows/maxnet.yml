@@ -147,6 +147,7 @@ jobs:
           RELEASE_TITLE: ${{ steps.versioning.outputs.semver }}
         run: |
           gh release create "$TAG_NAME" custom/release_files/* \
+            --repo "${{ github.repository }}" \
             --title "$RELEASE_TITLE" \
             --notes "### 🚀 MaxNet OpenWrt Firmware for Jio AirFiber IDU (JIDU6811)
             
