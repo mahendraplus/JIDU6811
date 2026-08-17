@@ -202,9 +202,9 @@ setenv fdt_high 0xffffffff
 setenv initrd_high 0xffffffff
 ```
 
-#### Command 6: Set Boot Arguments
+#### Command 6: Set Boot Arguments (with Early Console)
 ```bash
-setenv bootargs "console=ttyMSM0,115200n8"
+setenv bootargs "console=ttyMSM0,115200n8 earlycon"
 ```
 
 #### Command 7: Load Firmware from PC via TFTP
@@ -230,7 +230,7 @@ setenv fdt_high 0xffffffff
 setenv initrd_high 0xffffffff
 ```
 ```bash
-setenv bootargs "console=ttyMSM0,115200n8"
+setenv bootargs "console=ttyMSM0,115200n8 earlycon"
 ```
 ```bash
 saveenv
