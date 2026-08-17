@@ -99,6 +99,33 @@ minicom -D /dev/ttyUSB0 -b 115200
 
 ---
 
+## 🔑 U-Boot Serial Login Credentials
+
+During boot, when you interrupt autoboot, U-Boot may ask for login credentials:
+
+| Field | Value |
+| :--- | :--- |
+| **Username** | `________` (Unit specific) |
+| **Password** | `________________` (Unit specific) |
+
+> ⚠️ **Password Scheme:**
+> - **Username**: Last 8 digits of the RSN printed on the router's back label sticker (e.g. `A0167200` or `00123456`).
+> - **Password**: Unit-specific factory string generated at manufacturing.
+>
+> **Direct methods to extract your unit's exact U-Boot password:**
+> If you have shell/SSH access on stock firmware, run any of the following commands to view the exact password:
+> ```bash
+> gm_factory_init.sh get uboot_passwd
+> ```
+> ```bash
+> /usr/bin/jioMfgData get ubootPasswd
+> ```
+> ```bash
+> strings /dev/mtd7 | grep -i pass
+> ```
+
+---
+
 ## 🚀 Step 1: Safe RAM Boot via TFTP (No Risk)
 
 Testing in RAM is 100% risk-free — nothing is written to the flash memory until you are satisfied.
@@ -137,11 +164,7 @@ sudo systemctl restart tftpd-hpa
 
 ### 1.3 Boot in U-Boot (Run Each Command Separately):
 
-Power on the router and hit any key in serial console to stop autoboot. 
-
-If prompted for credentials:
-* **Username**: `A0167200`
-* **Password**: `7U@gR\{tl!Vka$.`
+Power on the router and press any key in serial console to stop autoboot. Enter your unit's U-Boot username and password.
 
 Once at the `IPQ9574#` prompt, enter these commands **one by one**:
 
