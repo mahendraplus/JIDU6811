@@ -23,7 +23,6 @@ fi
 # Fallback board.bin templates if not present
 mkdir -p /lib/firmware/ath11k/IPQ9574/hw1.0
 [ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin ] && [ -f /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin
-[ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/board-2.bin ] && [ -f /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/board-2.bin
 
 # Enable wireless radios if detected
 if uci get wireless.radio0 >/dev/null 2>&1; then
@@ -38,7 +37,7 @@ if uci get wireless.radio0 >/dev/null 2>&1; then
 		uci set wireless.@wifi-iface[-1].network="lan"
 		uci set wireless.@wifi-iface[-1].mode="ap"
 	fi
-	uci set wireless.default_radio0.ssid="MaxNet"
+	uci set wireless.default_radio0.ssid="MaxNet-5G"
 	uci set wireless.default_radio0.encryption="none"
 	uci delete wireless.default_radio0.key 2>/dev/null
 fi
@@ -47,7 +46,7 @@ if uci get wireless.radio1 >/dev/null 2>&1; then
 	uci set wireless.radio1.disabled="0"
 	uci set wireless.radio1.band="2g"
 	uci set wireless.radio1.channel="6"
-	uci set wireless.radio1.htmode="HE20"
+	uci set wireless.radio1.htmode="HT20"
 	uci set wireless.radio1.noscan="1"
 	uci set wireless.radio1.country="IN"
 	if ! uci get wireless.default_radio1 >/dev/null 2>&1; then
@@ -56,7 +55,7 @@ if uci get wireless.radio1 >/dev/null 2>&1; then
 		uci set wireless.@wifi-iface[-1].network="lan"
 		uci set wireless.@wifi-iface[-1].mode="ap"
 	fi
-	uci set wireless.default_radio1.ssid="MaxNet"
+	uci set wireless.default_radio1.ssid="MaxNet-2.4G"
 	uci set wireless.default_radio1.encryption="none"
 	uci delete wireless.default_radio1.key 2>/dev/null
 fi
