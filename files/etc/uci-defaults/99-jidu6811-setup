@@ -10,10 +10,17 @@ uci commit system
 uci set dropbear.@dropbear[0].Interface=""
 uci commit dropbear
 
-# Setup QCN9074 ath11k calibration file fallback if board.bin exists
+# Setup QCN9074 and IPQ9574 ath11k calibration file fallback if board.bin / bdwlan.bin exists
 mkdir -p /lib/firmware/ath11k/QCN9074/hw1.0
 if [ -f /lib/firmware/ath11k/QCN9074/hw1.0/board.bin ] && [ ! -e /lib/firmware/ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin ]; then
 	ln -sf /lib/firmware/ath11k/QCN9074/hw1.0/board.bin /lib/firmware/ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin
+fi
+
+mkdir -p /lib/firmware/ath11k/IPQ9574/hw1.0
+if [ -f /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin ]; then
+	[ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin
+	[ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/board-2.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/board-2.bin
+	[ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/cal-ahb-c000000.wifi.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/cal-ahb-c000000.wifi.bin
 fi
 
 # Enable wireless radios if detected
