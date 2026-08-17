@@ -99,30 +99,39 @@ minicom -D /dev/ttyUSB0 -b 115200
 
 ---
 
-## 🔑 U-Boot Serial Login Credentials
+## 🔑 U-Boot Login
 
-During boot, when you interrupt autoboot, U-Boot may ask for login credentials:
+During boot, if you see login prompts:
 
 | Field | Value |
 | :--- | :--- |
-| **Username** | `________` (Unit specific) |
-| **Password** | `________________` (Unit specific) |
+| **Username** | `________` |
+| **Password** | `________________` |
 
-> ⚠️ **Password Scheme:**
-> - **Username**: Last 8 digits of the RSN printed on the router's back label sticker (e.g. `A0167200` or `00123456`).
-> - **Password**: Unit-specific factory string generated at manufacturing.
->
-> **Direct methods to extract your unit's exact U-Boot password:**
-> If you have shell/SSH access on stock firmware, run any of the following commands to view the exact password:
-> ```bash
-> gm_factory_init.sh get uboot_passwd
-> ```
-> ```bash
-> /usr/bin/jioMfgData get ubootPasswd
-> ```
-> ```bash
-> strings /dev/mtd7 | grep -i pass
-> ```
+> ⚠️ **Status: Partially reverse-engineered.** The pattern below is confirmed on **JIDU6801 / JIDU6701** units from multiple independent samples. **JIDU6811 uses a different, not-yet-confirmed scheme** do not assume the formula below applies to it. This section will be updated once the JIDU6811 method is verified.
+
+**Observed pattern (JIDU6801 / JIDU6701):**
+
+- **Username** → last 8 digits of the RSN printed on the router's back sticker.
+- **Password** → appears to be *(reverse of the username digits) + (an 8-character alphanumeric suffix [9rOL8bjr,pYunNk45,etc)*.
+
+For example, if the RSN is `RTHHGAK00123456`, the U-Boot Username would be `00123456` and the U-Boot Password would be `654321009rOL8bjr` or `65432100pYunNk45`.
+
+**Reliable method get the exact password directly:**
+
+If you already have SSH access to the router (stock firmware or otherwise), the following commands retrieve the *actual* U-Boot password for that specific unit, with no guessing involved:
+
+```bash
+gm_factory_init.sh get uboot_passwd
+```
+
+```bash
+/usr/bin/jioMfgData get ubootPasswd
+```
+
+```bash
+strings /dev/mtd7 | grep -i pass
+```
 
 ---
 
