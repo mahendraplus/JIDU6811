@@ -1,10 +1,16 @@
-name: MaxNet Build
+name: MaxNet Firmware Engine
 
 on:
   push:
     branches:
       - Max
       - main
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '*.md'
+      - '.gitignore'
   workflow_dispatch:
 
 permissions:
@@ -12,7 +18,7 @@ permissions:
 
 jobs:
   build:
-    name: Fast Build & Release
+    name: Compile & Publish Firmware
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
