@@ -105,6 +105,12 @@
 	};
 
 	reserved-memory {
+		smem@4aa00000 {
+			compatible = "qcom,smem";
+			reg = <0x0 0x4aa00000 0x0 0x100000>;
+			no-map;
+		};
+
 		q6_region: wcnss@4ab00000 {
 			no-map;
 			reg = <0x0 0x4ab00000 0x0 0x2d00000>;

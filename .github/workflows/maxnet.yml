@@ -47,6 +47,10 @@ jobs:
           sed -i 's/CONFIG_DEBUG_INFO=y/# CONFIG_DEBUG_INFO is not set\nCONFIG_DEBUG_INFO_NONE=y/g' openwrt/target/linux/qualcommbe/config-6.18 2>/dev/null || true
           sed -i 's/CONFIG_DEBUG_BUGVERBOSE=y/# CONFIG_DEBUG_BUGVERBOSE is not set/g' openwrt/target/linux/qualcommbe/config-6.18 2>/dev/null || true
           sed -i 's/CONFIG_LOCK_DEBUGGING_SUPPORT=y/# CONFIG_LOCK_DEBUGGING_SUPPORT is not set/g' openwrt/target/linux/qualcommbe/config-6.18 2>/dev/null || true
+          sed -i 's/CONFIG_ARM64_PTR_AUTH=y/# CONFIG_ARM64_PTR_AUTH is not set/g' openwrt/target/linux/qualcommbe/config-6.18 2>/dev/null || true
+          sed -i 's/CONFIG_ARM64_PTR_AUTH_KERNEL=y/# CONFIG_ARM64_PTR_AUTH_KERNEL is not set/g' openwrt/target/linux/qualcommbe/config-6.18 2>/dev/null || true
+          sed -i 's/CONFIG_ARM64_GCS=y/# CONFIG_ARM64_GCS is not set/g' openwrt/target/linux/qualcommbe/config-6.18 2>/dev/null || true
+          sed -i 's/CONFIG_ARM64_SVE=y/# CONFIG_ARM64_SVE is not set/g' openwrt/target/linux/qualcommbe/config-6.18 2>/dev/null || true
 
       - name: Fast Cache OpenWrt Downloads & CCACHE
         uses: actions/cache@v4
