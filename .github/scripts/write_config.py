@@ -29,6 +29,9 @@ config = [
     "CONFIG_PACKAGE_kmod-qcom-ppe=y",
 
     # Core 2.4GHz / 5GHz Wi-Fi drivers and firmware
+    "CONFIG_PACKAGE_kmod-qrtr=y",
+    "CONFIG_PACKAGE_kmod-qrtr-smd=y",
+    "CONFIG_PACKAGE_kmod-qrtr-mhi=y",
     "CONFIG_PACKAGE_kmod-ath11k=y",
     "CONFIG_PACKAGE_kmod-ath11k-pci=y",
     "CONFIG_PACKAGE_kmod-ath11k-ahb=y",
