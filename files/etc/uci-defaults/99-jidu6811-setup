@@ -10,18 +10,20 @@ uci commit system
 uci set dropbear.@dropbear[0].Interface=""
 uci commit dropbear
 
-# Setup QCN9074 and IPQ9574 ath11k calibration file fallback if board.bin / bdwlan.bin exists
-mkdir -p /lib/firmware/ath11k/QCN9074/hw1.0
-if [ -f /lib/firmware/ath11k/QCN9074/hw1.0/board.bin ] && [ ! -e /lib/firmware/ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin ]; then
-	ln -sf /lib/firmware/ath11k/QCN9074/hw1.0/board.bin /lib/firmware/ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin
+# Extract real hardware calibration data from 0:ART partition
+. /lib/functions.sh
+art=$(find_mtd_chardev "0:ART")
+if [ -n "$art" ]; then
+	mkdir -p /lib/firmware/ath11k/IPQ9574/hw1.0
+	dd if=$art of=/lib/firmware/ath11k/IPQ9574/hw1.0/cal-ahb-c000000.wifi.bin bs=4096 skip=1 count=32 2>/dev/null
+	mkdir -p /lib/firmware/ath11k/QCN9074/hw1.0
+	dd if=$art of=/lib/firmware/ath11k/QCN9074/hw1.0/cal-pci-0001:01:00.0.bin bs=4096 skip=76 count=32 2>/dev/null
 fi
 
+# Fallback board.bin templates if not present
 mkdir -p /lib/firmware/ath11k/IPQ9574/hw1.0
-if [ -f /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin ]; then
-	[ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin
-	[ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/board-2.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/board-2.bin
-	[ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/cal-ahb-c000000.wifi.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/cal-ahb-c000000.wifi.bin
-fi
+[ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin ] && [ -f /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin
+[ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/board-2.bin ] && [ -f /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/board-2.bin
 
 # Enable wireless radios if detected
 if uci get wireless.radio0 >/dev/null 2>&1; then
