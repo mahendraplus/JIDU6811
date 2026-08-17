@@ -35,10 +35,10 @@ if uci get wireless.radio0 >/dev/null 2>&1; then
 		uci set wireless.@wifi-iface[-1].device="radio0"
 		uci set wireless.@wifi-iface[-1].network="lan"
 		uci set wireless.@wifi-iface[-1].mode="ap"
-		uci set wireless.@wifi-iface[-1].ssid="Maxnet-5G"
-		uci set wireless.@wifi-iface[-1].encryption="psk2"
-		uci set wireless.@wifi-iface[-1].key="maxnet1234"
 	fi
+	uci set wireless.default_radio0.ssid="MaxNet"
+	uci set wireless.default_radio0.encryption="none"
+	uci delete wireless.default_radio0.key 2>/dev/null
 fi
 
 if uci get wireless.radio1 >/dev/null 2>&1; then
@@ -53,10 +53,10 @@ if uci get wireless.radio1 >/dev/null 2>&1; then
 		uci set wireless.@wifi-iface[-1].device="radio1"
 		uci set wireless.@wifi-iface[-1].network="lan"
 		uci set wireless.@wifi-iface[-1].mode="ap"
-		uci set wireless.@wifi-iface[-1].ssid="Maxnet-2G"
-		uci set wireless.@wifi-iface[-1].encryption="psk2"
-		uci set wireless.@wifi-iface[-1].key="maxnet1234"
 	fi
+	uci set wireless.default_radio1.ssid="MaxNet"
+	uci set wireless.default_radio1.encryption="none"
+	uci delete wireless.default_radio1.key 2>/dev/null
 fi
 
 # Add USB Tethering interface (wan_usb) for mobile internet
