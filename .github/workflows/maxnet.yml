@@ -78,6 +78,9 @@ jobs:
           sed -i 's/@TARGET_qualcommax//g' package/kernel/linux/modules/netsupport.mk package/kernel/mac80211/ath.mk
           sed -i 's/default y if TARGET_qualcommax/default y/g' package/kernel/mac80211/ath.mk
           
+          # Wipe OpenWrt metadata cache to force rescanning of modified package Makefiles
+          rm -rf tmp
+          
           # Copy mac80211 patches for IPQ9574 AHB support
           mkdir -p package/kernel/mac80211/patches/ath11k/
           cp -r ../custom/patches/mac80211/* package/kernel/mac80211/patches/ath11k/ 2>/dev/null || true
