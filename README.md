@@ -173,9 +173,9 @@ sudo systemctl restart tftpd-hpa
 
 ### 1.3 Boot in U-Boot (Run Each Command Separately):
 
-Power on the router and press any key in serial console to stop autoboot. Enter your unit's U-Boot username and password.
+Power on the router and hit any key in serial console to stop autoboot. Enter your unit's U-Boot username and password.
 
-Once at the `IPQ9574#` prompt, enter these commands **one by one**:
+Once at the `IPQ9574#` prompt, run these commands **one by one**:
 
 #### Command 1: Set Board IP
 ```bash
@@ -187,9 +187,9 @@ setenv ipaddr 192.168.1.10
 setenv serverip 192.168.1.2
 ```
 
-#### Command 3: Disable Instruction Cache
+#### Command 3: Turn Off CPU Caches *(MANDATORY for Clean Kernel Boot)*
 ```bash
-icache off
+dcache off; icache off
 ```
 
 #### Command 4: Disable FDT Relocation
@@ -207,15 +207,39 @@ setenv initrd_high 0xffffffff
 setenv bootargs "console=ttyMSM0,115200n8"
 ```
 
-#### Command 7: Load Image from TFTP Server
+#### Command 7: Load Firmware from PC via TFTP
 ```bash
 tftpboot 0x46000000 initramfs.itb
 ```
 
-#### Command 8: Start Kernel
+#### Command 8: Boot Linux Kernel
 ```bash
 bootm 0x46000000
 ```
+
+---
+
+### ⚡ Permanent Setup (Optional - Save to Flash)
+
+If you want to save the environment variables permanently into U-Boot flash so you don't need to retype all variables every time:
+
+```bash
+setenv fdt_high 0xffffffff
+```
+```bash
+setenv initrd_high 0xffffffff
+```
+```bash
+setenv bootargs "console=ttyMSM0,115200n8"
+```
+```bash
+saveenv
+```
+
+After saving with `saveenv`, every future boot only requires:
+1. `dcache off; icache off`
+2. `tftpboot 0x46000000 initramfs.itb`
+3. `bootm 0x46000000`
 
 ---
 
