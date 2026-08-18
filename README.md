@@ -273,51 +273,33 @@ Within ~10 seconds of booting:
 
 ---
 
-## 💾 Step 3: Permanent Boot from NAND Flash (Standalone Router)
+## 💾 Step 3: Permanent Installation with Persistent Storage (Production Mode)
 
-To make OpenWrt boot automatically on every power-on without needing a PC or TFTP:
+To make OpenWrt boot in **1 second** and permanently save all Wi-Fi settings, passwords, and packages across reboots:
 
-### Step 3.1: Flash OpenWrt to NAND
-Run this on the router terminal (`root@Maxnet:~#`):
-
+### Step 3.1: Copy `sysupgrade.bin` to Router
+From your Linux PC terminal:
 ```bash
-mtd write /tmp/initramfs.itb ubi
+cat /tmp/sysupgrade.bin | ssh root@192.168.1.1 "cat > /tmp/sysupgrade.bin"
 ```
-
-*(If `/tmp/initramfs.itb` is not on the router, transfer it from your PC with: `cat /srv/tftp/initramfs.itb | ssh root@192.168.1.1 "cat > /tmp/initramfs.itb"`)*
+*(If needed, download `sysupgrade.bin` on your PC from the [Latest Release](https://github.com/mahendraplus/maxidu/releases/latest))*.
 
 ---
 
-### Step 3.2: Configure Permanent Autoboot
+### Step 3.2: Flash `sysupgrade.bin` on Router
+On the router terminal (`root@Maxnet:~#`):
+```bash
+sysupgrade -F -v -n /tmp/sysupgrade.bin
+```
+*(This partitions the NAND flash into the fast `kernel` volume and persistent `rootfs_data` (UBIFS) overlay)*.
 
-#### Option A: In Router Terminal (SSH)
-```bash
-echo '/dev/mtd17 0x0 0x40000 0x20000' > /etc/fw_env.config
-```
-```bash
-fw_setenv bootcmd 'dcache off; icache off; nand read 0x44000000 0x1700000 0x1100000; bootm 0x44000000'
-```
-```bash
-fw_setenv bootargs 'console=ttyMSM0,115200n8 earlycon'
-```
-```bash
-fw_setenv fdt_high ''
-```
-```bash
-fw_setenv initrd_high ''
-```
-```bash
-reboot
-```
+---
 
-#### Option B: In U-Boot Serial (`IPQ9574#`)
-Run these short commands one by one to prevent serial console buffer clipping:
+### Step 3.3: Set Permanent UBI Autoboot in U-Boot
 
+Once the router restarts, at the `IPQ9574#` prompt, enter these commands:
 ```bash
-setenv boot_read "nand read 0x44000000 0x1700000 0x1100000"
-```
-```bash
-setenv bootcmd "dcache off; run boot_read; bootm 0x44000000"
+setenv bootcmd "ubi part ubi; ubi read 0x44000000 kernel; bootm 0x44000000"
 ```
 ```bash
 setenv fdt_high
@@ -334,8 +316,11 @@ reset
 
 ---
 
-### 🎉 Done!
-Your router is now permanently flashed. Whenever plugged into power, it will automatically boot into OpenWrt in **1 second** standalone!
+### 🎉 Congratulations!
+Your router is now running full **OpenWrt Production Mode**:
+* ⚡ **1-Second Fast Boot**: Loads the optimized kernel directly from UBI.
+* 💾 **Persistent NAND Storage**: All Wi-Fi passwords, SSIDs, and configuration changes are permanently saved across reboots.
+* 🚫 **No Recovery Warning**: LuCI runs in full read-write mode.
 
 ---
 
