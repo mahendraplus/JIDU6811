@@ -59,6 +59,18 @@ Official high-performance OpenWrt **Linux 6.18 (AArch64 64-bit)** firmware for t
 
 ---
 
+## 📦 Release Files Explained
+
+Every release provides three firmware binaries tailored for different stages:
+
+| File Name | Typical Size | Primary Purpose | How to Use |
+| :--- | :---: | :--- | :--- |
+| **`initramfs.itb`** | ~16.6 MB | **RAM Boot & Initial Flash (Recommended)** | Loaded via TFTP in U-Boot (`tftpboot 0x46000000 initramfs.itb`) or written directly to NAND (`mtd write /tmp/initramfs.itb ubi`). |
+| **`sysupgrade.bin`** | ~14.7 MB | **Future Web Dashboard Upgrades** | Used to upgrade an already running OpenWrt router via LuCI (**System → Backup / Flash Firmware**) or `sysupgrade`. |
+| **`factory.ubi`** | ~15.5 MB | **Raw UBI NAND Container** | Raw UBI image containing separate `kernel` and `rootfs` squashfs volumes. |
+
+---
+
 ## 🛠️ Requirements & PC Setup
 
 ### 1. Hardware Needed:
