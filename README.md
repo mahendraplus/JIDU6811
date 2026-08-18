@@ -311,11 +311,13 @@ reboot
 ```
 
 #### Option B: In U-Boot Serial (`IPQ9574#`)
-> ⚠️ **Notice**: Make sure `0x1100000` has **5 zeros** (17 MB).
+Run these short commands one by one to prevent serial console buffer clipping:
 
-Run these commands one by one:
 ```bash
-setenv bootcmd "dcache off; icache off; nand read 0x44000000 0x1700000 0x1100000; bootm 0x44000000"
+setenv boot_read "nand read 0x44000000 0x1700000 0x1100000"
+```
+```bash
+setenv bootcmd "dcache off; run boot_read; bootm 0x44000000"
 ```
 ```bash
 setenv fdt_high
