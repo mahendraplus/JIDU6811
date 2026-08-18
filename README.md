@@ -311,7 +311,9 @@ reboot
 ```
 
 #### Option B: In U-Boot Serial (`IPQ9574#`)
-Run these 5 commands one by one:
+> ⚠️ **Notice**: Make sure `0x1100000` has **5 zeros** (17 MB).
+
+Run these commands one by one:
 ```bash
 setenv bootcmd "dcache off; icache off; nand read 0x44000000 0x1700000 0x1100000; bootm 0x44000000"
 ```
