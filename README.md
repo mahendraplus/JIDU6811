@@ -261,19 +261,74 @@ Within ~10 seconds of booting:
 
 ---
 
-## 💾 Step 3: Permanent Flash to NAND (Optional)
+## 💾 Step 3: Permanent Boot from NAND Flash (Standalone Router)
 
-Once you have verified OpenWrt in RAM, you can flash it permanently to the internal NAND storage:
+To make OpenWrt boot automatically on every power-on without needing TFTP or a connected PC:
 
-### Method A: Web UI (LuCI Sysupgrade) — Recommended
-1. Open **[http://192.168.1.1](http://192.168.1.1)** in your browser.
-2. Navigate to **System → Backup / Flash Firmware**.
-3. Under **Flash new firmware image**, upload **`sysupgrade.bin`** downloaded from the [Latest Release](https://github.com/mahendraplus/maxidu/releases/latest).
-4. Click **Flash image...** and follow the on-screen prompt.
+### Method A: Via SSH / Serial Terminal (Fastest — 1 Step)
+If you are already logged into OpenWrt (`root@Maxnet:~#`):
 
-### Method B: Command Line (SSH)
+1. Write the OpenWrt firmware directly into the NAND `ubi` partition:
 ```bash
-sysupgrade -v -n /tmp/sysupgrade.bin
+mtd write /tmp/initramfs.itb ubi
+```
+
+2. Set permanent U-Boot autoboot environment:
+```bash
+echo '/dev/mtd17 0x0 0x40000 0x20000' > /etc/fw_env.config
+```
+```bash
+fw_setenv bootcmd 'dcache off; icache off; setenv fdt_high; setenv initrd_high; nand read 0x44000000 0x1700000 0x1100000; bootm 0x44000000'
+```
+```bash
+fw_setenv bootargs 'console=ttyMSM0,115200n8 earlycon'
+```
+
+3. Reboot:
+```bash
+reboot
+```
+
+---
+
+### Method B: Via U-Boot Serial Console
+From the `IPQ9574#` prompt:
+
+1. Load image to RAM:
+```bash
+tftpboot 0x46000000 initramfs.itb
+```
+
+2. Erase the firmware area in NAND:
+```bash
+nand erase 0x1700000 0x1200000
+```
+
+3. Write firmware from RAM to NAND flash:
+```bash
+nand write 0x46000000 0x1700000 0x1100000
+```
+
+4. Save permanent autoboot commands to U-Boot environment:
+```bash
+setenv bootcmd "dcache off; icache off; setenv fdt_high; setenv initrd_high; nand read 0x44000000 0x1700000 0x1100000; bootm 0x44000000"
+```
+```bash
+setenv bootargs "console=ttyMSM0,115200n8 earlycon"
+```
+```bash
+setenv fdt_high
+```
+```bash
+setenv initrd_high
+```
+```bash
+saveenv
+```
+
+5. Reboot into permanent OpenWrt:
+```bash
+reset
 ```
 
 ---
