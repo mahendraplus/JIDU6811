@@ -36,8 +36,8 @@ Official high-performance OpenWrt **Linux 6.18 (AArch64 64-bit)** firmware for t
 | **CPU Architecture** | 🟢 Working | Quad-Core ARM Cortex-A73 @ 2.2 GHz (AArch64 64-bit, Linux 6.18.44) |
 | **RAM / NAND Storage** | 🟢 Working | 512 MB DDR4 RAM + 256 MB Winbond SPI Serial NAND (`W25N02KWZEIR`) |
 | **Switch & Ethernet Ports** | 🟢 Working | WAN (Blue Port) + LAN1-LAN4 (Yellow Ports) via Qualcomm QCA8075 Switch |
-| **5 GHz Wi-Fi 6** | 🟢 Working | Qualcomm QCN9074 PCIe (`ath11k_pci`), HE80 @ Channel 36, 30.00 dBm |
-| **2.4 GHz Wi-Fi 6** | 🟢 Working | Qualcomm IPQ9574 AHB (`ath11k_ahb`), Hexagon Q6 WCSS DSP, HE20 @ Channel 6, 30.00 dBm |
+| **5 GHz Wi-Fi 6** | 🟢 Working | Qualcomm QCN9074 PCIe (`ath11k_pci`), HE80 @ Channel 36, 30.00 dBm (`MaxNet-5G`, 100% Signal) |
+| **2.4 GHz Wi-Fi 6** | 🟢 Working | Qualcomm IPQ9574 AHB (`ath11k_ahb`), Hexagon Q6 DSP, HT20 @ Channel 1, 30.00 dBm (`MaxNet-2.4G`, 100% Signal) |
 | **USB 3.0 & 4G/5G Tethering** | 🟢 Working | SuperSpeed USB 3.0 Storage + Android/iPhone USB Tethering (`rndis` / `cdc_ether`) |
 | **LuCI Web Dashboard & SSH** | 🟢 Working | Web: `http://192.168.1.1` \| SSH: `root@192.168.1.1` (Port 22) |
 | **Dynamic 3-Stage LEDs** | 🟢 Working | 🔴 Booting → 🔵 Ready / Standby → 🟢 Online (Internet Active) |
@@ -52,7 +52,8 @@ Official high-performance OpenWrt **Linux 6.18 (AArch64 64-bit)** firmware for t
 | **Web Interface (LuCI)** | `http://192.168.1.1` |
 | **SSH Login** | `ssh root@192.168.1.1` |
 | **Root Password** | *(None / Blank by default)* |
-| **Default Wi-Fi Network Name (SSID)** | **`MaxNet`** (Unified on both 2.4 GHz and 5 GHz) |
+| **Default 2.4 GHz Wi-Fi (SSID)** | **`MaxNet-2.4G`** (Channel 1, Open) |
+| **Default 5 GHz Wi-Fi (SSID)** | **`MaxNet-5G`** (Channel 36, Open) |
 | **Default Wi-Fi Password** | **Open / No password** |
 | **U-Boot Serial Baudrate** | `115200 8N1` |
 
@@ -192,14 +193,14 @@ setenv serverip 192.168.1.2
 dcache off; icache off
 ```
 
-#### Command 4: Disable FDT Relocation
+#### Command 4: Allow Safe FDT Relocation
 ```bash
-setenv fdt_high 0xffffffff
+setenv fdt_high
 ```
 
-#### Command 5: Disable Initrd Relocation
+#### Command 5: Allow Safe Initrd Relocation
 ```bash
-setenv initrd_high 0xffffffff
+setenv initrd_high
 ```
 
 #### Command 6: Set Boot Arguments (with Early Console)
@@ -224,10 +225,10 @@ bootm 0x46000000
 If you want to save the environment variables permanently into U-Boot flash so you don't need to retype all variables every time:
 
 ```bash
-setenv fdt_high 0xffffffff
+setenv fdt_high
 ```
 ```bash
-setenv initrd_high 0xffffffff
+setenv initrd_high
 ```
 ```bash
 setenv bootargs "console=ttyMSM0,115200n8 earlycon"
@@ -256,7 +257,7 @@ Within ~10 seconds of booting:
    ```
 
 3. **Connect via Wi-Fi**:
-   Search for the open Wi-Fi network **`MaxNet`** on your smartphone or laptop (available on both 2.4 GHz and 5 GHz).
+   Search for the open Wi-Fi networks **`MaxNet-2.4G`** or **`MaxNet-5G`** on your smartphone or laptop (both broadcast at full signal strength with no password required).
 
 ---
 
