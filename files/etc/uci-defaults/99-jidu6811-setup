@@ -24,6 +24,9 @@ fi
 mkdir -p /lib/firmware/ath11k/IPQ9574/hw1.0
 [ ! -e /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin ] && [ -f /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin ] && ln -sf /lib/firmware/ath11k/IPQ9574/hw1.0/bdwlan.bin /lib/firmware/ath11k/IPQ9574/hw1.0/board.bin
 
+# Ensure wireless config exists
+[ ! -f /etc/config/wireless ] || [ ! -s /etc/config/wireless ] && wifi config 2>/dev/null || true
+
 # Enable wireless radios if detected
 if uci get wireless.radio0 >/dev/null 2>&1; then
 	uci set wireless.radio0.disabled="0"
