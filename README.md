@@ -266,14 +266,19 @@ Within ~10 seconds of booting:
 To make OpenWrt boot automatically on every power-on without needing TFTP or a connected PC:
 
 ### Method A: Via SSH / Serial Terminal (Fastest — 1 Step)
-If you are already logged into OpenWrt (`root@Maxnet:~#`):
+If you are currently running OpenWrt in RAM (`root@Maxnet:~#`):
 
-1. Write the OpenWrt firmware directly into the NAND `ubi` partition:
+1. From your Linux PC terminal, transfer the firmware file to the router:
+```bash
+cat /srv/tftp/initramfs.itb | ssh root@192.168.1.1 "cat > /tmp/initramfs.itb"
+```
+
+2. On the router terminal (`root@Maxnet:~#`), write the firmware directly into the NAND `ubi` partition:
 ```bash
 mtd write /tmp/initramfs.itb ubi
 ```
 
-2. Set permanent U-Boot autoboot environment:
+3. Set permanent U-Boot autoboot environment:
 ```bash
 echo '/dev/mtd17 0x0 0x40000 0x20000' > /etc/fw_env.config
 ```
@@ -284,7 +289,7 @@ fw_setenv bootcmd 'dcache off; icache off; setenv fdt_high; setenv initrd_high; 
 fw_setenv bootargs 'console=ttyMSM0,115200n8 earlycon'
 ```
 
-3. Reboot:
+4. Reboot:
 ```bash
 reboot
 ```
