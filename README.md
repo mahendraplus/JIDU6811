@@ -43,12 +43,12 @@
 
 ## 🧭 Overview
 
-**MaxNet** is custom OpenWrt firmware for the **Jio AirFiber IDU** (Indoor Unit) router, replacing the limited stock firmware with a full Linux-based router operating system. Built on the Qualcomm **IPQ9574 / IPQ9554** platform, it unlocks the hardware's full potential: hardware-accelerated NAT routing, dual-band **Wi-Fi 6**, a complete LuCI web dashboard, SSH access, and the entire OpenWrt package ecosystem — all running on **Linux 6.18 (AArch64)**.
+**MaxNet** is custom OpenWrt firmware for the **Jio AirFiber IDU** (Indoor Unit) router, replacing the limited stock firmware with a full Linux-based router operating system. Built on the Qualcomm[...]
 
-Whether you want faster throughput, advanced firewall/VPN control, USB tethering fallback, or full ownership of your router, MaxNet turns a Jio AirFiber IDU into a genuine high-performance OpenWrt router.
+Whether you want faster throughput, advanced firewall/VPN control, USB tethering fallback, or full ownership of your router, MaxNet turns a Jio AirFiber IDU into a genuine high-performance OpenWrt[...]
 
 > [!NOTE]
-> New to OpenWrt or router flashing? Read this entire guide once before starting. **Step 1 (RAM boot)** is completely reversible and lets you try everything safely before making any permanent change in **Step 3**.
+> New to OpenWrt or router flashing? Read this entire guide once before starting. **Step 1 (RAM boot)** is completely reversible and lets you try everything safely before making any permanent chan[...]
 
 ---
 
@@ -95,7 +95,7 @@ Whether you want faster throughput, advanced firewall/VPN control, USB tethering
 | **Serial Console Baudrate** | `115200 8N1` | Flow control: None |
 
 > [!IMPORTANT]
-> Default Wi-Fi networks are **open (unencrypted)**. Set a WPA2/WPA3 password and change the root password **immediately** after your first login — see the [FAQ](#-comprehensive-troubleshooting--faq) for exact steps.
+> Default Wi-Fi networks are **open (unencrypted)**. Set a WPA2/WPA3 password and change the root password **immediately** after your first login — see the [FAQ](#-comprehensive-troubleshooting-[...]
 
 ---
 
@@ -106,7 +106,7 @@ Every release provides three firmware binaries tailored for different stages:
 | File Name | Typical Size | Primary Purpose | How to Use |
 | :--- | :---: | :--- | :--- |
 | **`initramfs.itb`** | ~16.6 MB | **RAM Boot & Testing (No Risk)** | Loaded into memory via TFTP in U-Boot (`tftpboot 0x46000000 initramfs.itb` → `bootm 0x46000000`). Leaves NAND untouched. |
-| **`sysupgrade.bin`** | ~14.7 MB | **Permanent Production Flash & Web Upgrades** | Used to install or upgrade OpenWrt permanently with persistent storage via LuCI Web UI or `sysupgrade` command. |
+| **`sysupgrade.bin`** | ~14.7 MB | **Permanent Production Flash & Web Upgrades** | Used to install or upgrade OpenWrt permanently with persistent storage via LuCI Web UI or `sysupgrade` command.[...]
 | **`factory.ubi`** | ~15.5 MB | **Raw UBI NAND Container** | Raw UBI image formatted for the NAND `ubi` partition, containing separate `kernel` and `rootfs` squashfs volumes. |
 
 ---
@@ -114,7 +114,7 @@ Every release provides three firmware binaries tailored for different stages:
 ## 🚨 Safety Notice
 
 > [!WARNING]
-> Flashing custom firmware modifies your router at a low level. **Step 1 (RAM boot)** is 100% reversible, but **Step 3 (permanent flash)** overwrites your current firmware. Please read before proceeding:
+> Flashing custom firmware modifies your router at a low level. **Step 1 (RAM boot)** is 100% reversible, but **Step 3 (permanent flash)** overwrites your current firmware. Please read before pro[...]
 >
 > - **Confirm your exact model** (`JIDU6811` or `JIDU6J11-6811`) printed on the device label before flashing anything.
 > - **Never disconnect power or Ethernet** during an active flash or `sysupgrade` — this can corrupt the flash and hard-brick the device.
@@ -141,7 +141,7 @@ sudo apt update && sudo apt install -y minicom tftpd-hpa curl
 ### 3. Grant Permanent Serial Port Permissions (One-Time Setup)
 Run this once so you never need `sudo chmod 777 /dev/ttyUSB0` again:
 ```bash
-echo 'KERNEL=="ttyUSB*", MODE="0666", GROUP="dialout"' | sudo tee /etc/udev/rules.d/99-ttyusb.rules && echo 'KERNEL=="ttyACM*", MODE="0666", GROUP="dialout"' | sudo tee -a /etc/udev/rules.d/99-ttyusb.rules && sudo usermod -aG dialout,tty $USER && sudo udevadm control --reload-rules && sudo udevadm trigger
+echo 'KERNEL=="ttyUSB*", MODE="0666", GROUP="dialout"' | sudo tee /etc/udev/rules.d/99-ttyusb.rules && echo 'KERNEL=="ttyACM*", MODE="0666", GROUP="dialout"' | sudo tee -a /etc/udev/rules.d/99-tt[...]
 ```
 > [!TIP]
 > Log out and back in (or reboot) afterward so your new `dialout`/`tty` group membership takes effect.
@@ -265,7 +265,7 @@ Within about 10 seconds of booting:
 
 ## 💾 Step 3: Permanent Production Installation (Persistent Flash)
 
-Once you've confirmed everything works in RAM boot mode, make it permanent. This installs OpenWrt so it boots in **~1 second** and keeps all Wi-Fi settings, passwords, and packages across reboots.
+Once you've confirmed everything works in RAM boot mode, make it permanent. This installs OpenWrt so it boots in **~1 second** and keeps all Wi-Fi settings, passwords, and packages across reboots[...]
 
 ### Method A: Flash via LuCI Web Dashboard (Recommended)
 1. Download **`sysupgrade.bin`** from the [Latest Release](https://github.com/mahendraplus/maxidu/releases/latest).
@@ -322,7 +322,7 @@ Your router is now permanently running full **OpenWrt Production Mode**:
 ## 💡 Tips & Advanced Features
 
 ### 1. USB 4G/5G Phone Tethering
-Plug an Android phone or iPhone into the USB 3.0 port and enable **USB Tethering** in the phone's settings. The router automatically detects the connection (`wan_usb` interface) and shares mobile internet across all Ethernet ports and Wi-Fi networks — zero configuration needed.
+Plug an Android phone or iPhone into the USB 3.0 port and enable **USB Tethering** in the phone's settings. The router automatically detects the connection (`wan_usb` interface) and shares mobile[...]
 
 ### 2. Dynamic 3-Stage LED Status Indicators
 An automated hardware daemon continuously monitors network connectivity:
@@ -337,6 +337,8 @@ iw dev
 ```
 ```bash
 iwinfo phy0-ap0 info
+```
+```bash
 iwinfo phy1-ap0 info
 ```
 
@@ -345,10 +347,10 @@ iwinfo phy1-ap0 info
 ## ❓ Comprehensive Troubleshooting & FAQ
 
 #### Q: Why did LuCI say `invalid sysupgrade file Image check failed` during upload?
-**A:** When migrating from stock firmware or an initial RAM boot (`initramfs.itb`), OpenWrt's metadata validator can't find an existing board profile in flash. Check the ☑️ **Force upgrade** box and click **Continue** — the firmware will flash successfully.
+**A:** When migrating from stock firmware or an initial RAM boot (`initramfs.itb`), OpenWrt's metadata validator can't find an existing board profile in flash. Check the ☑️ **Force upgrade** [...]
 
 #### Q: Why did U-Boot show `Console buffer overflow occured!!` or clip my pasted command?
-**A:** U-Boot's serial console input buffer has a strict line-length limit (~64 characters). Avoid pasting long, multi-command chains as a single line — run each command separately, exactly as shown in the step-by-step guide.
+**A:** U-Boot's serial console input buffer has a strict line-length limit (~64 characters). Avoid pasting long, multi-command chains as a single line — run each command separately, exactly as [...]
 
 #### Q: TFTP transfer times out (`T T T T T`)?
 **A:**
@@ -358,16 +360,26 @@ iwinfo phy1-ap0 info
 4. Connect the router and PC directly, or through a simple unmanaged switch — some managed switches block TFTP/BOOTP traffic.
 
 #### Q: How do I change the Wi-Fi password or SSID?
-**A:** Open **[http://192.168.1.1](http://192.168.1.1)** → **Network → Wireless**, click **Edit** on `radio0` (5G) or `radio1` (2.4G), set your desired SSID and WPA2/WPA3 password, then click **Save & Apply**.
+**A:** Open **[http://192.168.1.1](http://192.168.1.1)** → **Network → Wireless**, click **Edit** on `radio0` (5G) or `radio1` (2.4G), set your desired SSID and WPA2/WPA3 password, then click[...]
 
 #### Q: How do I set the root password?
 **A:** Open LuCI → **System → Administration**, enter a new password, and click **Save & Apply**. From SSH, run `passwd` and follow the prompts instead.
 
 #### Q: My serial adapter shows no output — what should I check?
-**A:** Confirm the baud rate is `115200 8N1`, make sure TX/RX aren't swapped (adapter TX → router RX, and vice versa), verify GND is connected, and check that `/dev/ttyUSB0` (or `/dev/ttyACM0`) appears via `ls /dev/tty*` after plugging in the adapter.
+**A:** Confirm the baud rate is `115200 8N1`, make sure TX/RX aren't swapped (adapter TX → router RX, and vice versa), verify GND is connected, and check that `/dev/ttyUSB0` (or `/dev/ttyACM0`) appe[...]
 
 #### Q: Where can I get help for an issue not covered here?
-**A:** Open a new [GitHub Issue](https://github.com/mahendraplus/maxidu/issues) with your exact model number, the step you're stuck on, and any serial console output — this makes diagnosis much faster.
+**A:** Open a new [GitHub Issue](https://github.com/mahendraplus/maxidu/issues) with your exact model number, the step you're stuck on, and any serial console output — this makes diagnosis much[...]
+
+---
+
+## 🙏 Special Thanks
+
+Special thanks to "Sandiep" ([https://github.com/Sandiep](https://github.com/Sandiep)) for the research, PRs, reverse-engineering, debugging, fixes, and continuous support that helped make this firmware possible.
+
+A lot of what I learned during this project came from his work and guidance.
+
+Huge respect and thank you, Sandiep. ❤️
 
 ---
 
