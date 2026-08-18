@@ -263,63 +263,45 @@ Within ~10 seconds of booting:
 
 ## 💾 Step 3: Permanent Boot from NAND Flash (Standalone Router)
 
-To make OpenWrt boot automatically on every power-on without needing TFTP or a connected PC:
+To make OpenWrt boot automatically on every power-on without needing a PC or TFTP:
 
-### Method A: Via SSH / Serial Terminal (Fastest — 1 Step)
-If you are currently running OpenWrt in RAM (`root@Maxnet:~#`):
+### Step 3.1: Flash OpenWrt to NAND
+Run this on the router terminal (`root@Maxnet:~#`):
 
-1. From your Linux PC terminal, transfer the firmware file to the router:
-```bash
-cat /srv/tftp/initramfs.itb | ssh root@192.168.1.1 "cat > /tmp/initramfs.itb"
-```
-
-2. On the router terminal (`root@Maxnet:~#`), write the firmware directly into the NAND `ubi` partition:
 ```bash
 mtd write /tmp/initramfs.itb ubi
 ```
 
-3. Set permanent U-Boot autoboot environment:
+*(If `/tmp/initramfs.itb` is not on the router, transfer it from your PC with: `cat /srv/tftp/initramfs.itb | ssh root@192.168.1.1 "cat > /tmp/initramfs.itb"`)*
+
+---
+
+### Step 3.2: Configure Permanent Autoboot
+
+#### Option A: In Router Terminal (SSH)
 ```bash
 echo '/dev/mtd17 0x0 0x40000 0x20000' > /etc/fw_env.config
 ```
 ```bash
-fw_setenv bootcmd 'dcache off; icache off; setenv fdt_high; setenv initrd_high; nand read 0x44000000 0x1700000 0x1100000; bootm 0x44000000'
+fw_setenv bootcmd 'dcache off; icache off; nand read 0x44000000 0x1700000 0x1100000; bootm 0x44000000'
 ```
 ```bash
 fw_setenv bootargs 'console=ttyMSM0,115200n8 earlycon'
 ```
-
-4. Reboot:
+```bash
+fw_setenv fdt_high ''
+```
+```bash
+fw_setenv initrd_high ''
+```
 ```bash
 reboot
 ```
 
----
-
-### Method B: Via U-Boot Serial Console
-From the `IPQ9574#` prompt:
-
-1. Load image to RAM:
+#### Option B: In U-Boot Serial (`IPQ9574#`)
+Run these 5 commands one by one:
 ```bash
-tftpboot 0x46000000 initramfs.itb
-```
-
-2. Erase the firmware area in NAND:
-```bash
-nand erase 0x1700000 0x1200000
-```
-
-3. Write firmware from RAM to NAND flash:
-```bash
-nand write 0x46000000 0x1700000 0x1100000
-```
-
-4. Save permanent autoboot commands to U-Boot environment:
-```bash
-setenv bootcmd "dcache off; icache off; setenv fdt_high; setenv initrd_high; nand read 0x44000000 0x1700000 0x1100000; bootm 0x44000000"
-```
-```bash
-setenv bootargs "console=ttyMSM0,115200n8 earlycon"
+setenv bootcmd "dcache off; icache off; nand read 0x44000000 0x1700000 0x1100000; bootm 0x44000000"
 ```
 ```bash
 setenv fdt_high
@@ -330,11 +312,14 @@ setenv initrd_high
 ```bash
 saveenv
 ```
-
-5. Reboot into permanent OpenWrt:
 ```bash
 reset
 ```
+
+---
+
+### 🎉 Done!
+Your router is now permanently flashed. Whenever plugged into power, it will automatically boot into OpenWrt in **1 second** standalone!
 
 ---
 
