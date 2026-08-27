@@ -15,6 +15,16 @@
 
 </div>
 
+## 💬 Help & Support
+
+Have questions, need help, or want the latest updates? Join our official Telegram channel — active community, quick support, and news first.
+
+<p align="center">
+  <a href="https://t.me/maxnetq">
+    <img src="https://img.shields.io/badge/Telegram-Join%20Channel-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Join Telegram"/>
+  </a>
+</p>
+
 ---
 
 ## 📑 Table of Contents
