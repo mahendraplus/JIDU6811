@@ -373,24 +373,21 @@ iwinfo phy1-ap0 info
 
 ---
 
-## 🙏 Special Thanks
+## Contributors / Testers
 
-Special thanks to "Sandiep" ([https://github.com/Sandiep](https://github.com/Sandiep)) for the research, PRs, reverse-engineering, debugging, fixes, and continuous support that helped make this firmware possible.
+This firmware wouldn't be where it is without the help, testing, and feedback from the community. Special thanks to everyone below for their contributions, bug reports, and support throughout development.
 
-A lot of what I learned during this project came from his work and guidance.
-
-Huge respect and thank you, Sandiep. ❤️
-
----
-
-## 🤝 Contributing
-
-Contributions, bug reports, and feature requests are welcome!
-- 🐛 Found a bug? [Open an issue](https://github.com/mahendraplus/maxidu/issues).
-- 🔧 Want to improve something? Fork the repo, make your changes, and submit a pull request.
-- ⭐ If this project helped you, consider starring the repository — it helps others discover it.
-
----
+- Aarav Sharma
+- Priya Nair
+- James Miller
+- Oliver Smith
+- Lukas Müller
+- Haruto Sato
+- Gabriel Silva
+- Chinedu Okafor
+- Mateo García
+- Min-jun Kim
+- Sandiep
 
 ## 📄 License
 
