@@ -87,7 +87,7 @@ Whether you want faster throughput, advanced firewall/VPN control, USB tethering
 | **2.4 GHz Wi-Fi 6** | 🟢 Working | Qualcomm IPQ9574 AHB (`ath11k_ahb`), Hexagon Q6 DSP, HT20/HE20 @ Channel 1, 30.00 dBm (`MaxNet-2.4G`, 100% Signal) |
 | **USB 3.0 & 4G/5G Tethering** | 🟢 Working | SuperSpeed USB 3.0 Host + Android/iPhone Mobile USB Tethering (`rndis` / `cdc_ether`) |
 | **LuCI Web Dashboard & SSH** | 🟢 Working | Web UI: `http://192.168.1.1` \| SSH: `root@192.168.1.1` (Port 22) |
-| **Dynamic 3-Stage LEDs** | 🟢 Working | 🔴 Booting → 🔵 Ready / Standby → 🟢 Online (Internet Reachable) |
+| **Dynamic Internet LEDs** | 🟢 Working | 🔴 Booting/Offline → 🟢 WAN Online → 🟣 USB Online |
 
 ---
 
@@ -334,11 +334,14 @@ Your router is now permanently running full **OpenWrt Production Mode**:
 ### 1. USB 4G/5G Phone Tethering
 Plug an Android phone or iPhone into the USB 3.0 port and enable **USB Tethering** in the phone's settings. The router automatically detects the connection (`wan_usb` interface) and shares mobile[...]
 
-### 2. Dynamic 3-Stage LED Status Indicators
-An automated hardware daemon continuously monitors network connectivity:
-- 🔴 **Red Solid** — router is booting and initializing hardware peripherals.
-- 🔵 **Blue Solid** — OpenWrt is ready (LAN & Wi-Fi active, waiting for WAN/Internet).
-- 🟢 **Green Solid** — connected to the Internet (gateway and DNS reachable).
+### 2. Dynamic Internet LED Status Indicators
+The supervised `led_internet_monitor` service continuously follows the kernel’s selected Internet route:
+- 🔴 **Red Blinking** — the network is still settling during boot.
+- 🔴 **Red Solid** — no usable route exists or the selected uplink cannot reach the Internet.
+- 🟢 **Green Solid** — Internet is reachable through the logical `wan` interface.
+- 🟣 **Red + Blue Solid** — Internet is reachable through USB tethering on `usb0` (magenta/pink).
+
+The monitor checks the actual Layer 3 WAN device, uses consecutive-success/failure hysteresis, and is supervised by OpenWrt `procd`. See the [Internet LED Monitor guide](docs/led-internet-monitor.md) for configuration, verification, and troubleshooting.
 
 ### 3. Wi-Fi Management & Verification
 Check active wireless status and signal strength from the router terminal:
